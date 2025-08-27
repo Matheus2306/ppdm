@@ -19,21 +19,23 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Contador</Text>
-      <Text style={styles.counterText}>{contador}</Text>
       <View style={styles.containerbutton}>
-        <TouchableOpacity style={styles.button} onPress={handleIncrement}>
-          <Text style={styles.buttonText}>+ aumentar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handledecrement}>
-          <Text style={styles.buttonText}>- Diminuir</Text>
+        <Text style={styles.counterText}>{contador}</Text>
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.button} onPress={handleIncrement}>
+            <Text style={styles.buttonText}>+ aumentar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handledecrement}>
+            <Text style={styles.buttonText}>- Diminuir</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          style={[styles.button, styles.resetbutton]}
+          onPress={handleReset}
+        >
+          <Text style={styles.buttonText}>Zerar</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={[styles.button, styles.resetbutton]}
-        onPress={handleReset}
-      >
-        <Text style={styles.buttonText}>Zerar</Text>
-      </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
@@ -42,19 +44,19 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#7D04A9",
   },
   title: {
     fontSize: 32,
+    marginTop: 40,
+    marginStart: 21,
     fontWeight: "bold",
     marginBottom: 30,
   },
   counterText: {
     fontSize: 64,
     fontWeight: "bold",
-    color: "#000",
+    color: "#1649CB",
     marginBottom: 30,
   },
   button: {
@@ -63,17 +65,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 10,
   },
+  buttons: {
+    flex: 1,
+    flexDirection:"row",
+    justifyContent:"center",
+    alignItems:"center",
+    gap:12
+  },
   buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
-  containerbutton:{
-    flexDirection:"row-reverse",
-    marginBottom:20,
-    gap:6,
+  containerbutton: {
+    alignItems: "center",
+    flexDirection: "column",
+    marginBottom: 20,
+    gap: 6,
   },
-  resetbutton:{
-    backgroundColor:"#dc3545",
-  }
+  resetbutton: {
+    backgroundColor: "#dc3545",
+  },
 });
