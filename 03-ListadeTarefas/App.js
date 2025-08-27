@@ -1,20 +1,112 @@
 import { StatusBar } from "expo-status-bar";
 import {
+  Alert,
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 
 export default function App() {
+  //variavel de armazenamento das tarefas
+  const [task, setTask] = useState([]);
+  //estado para o texto da tarefa
+  const [newtask, setNewtask] = useState("");
+
+  useEffect(() => {
+    const loadtasks = async () => {
+      try {
+        const savetasks = await AsyncStorage.getItem("tasks");
+        savetasks && setTask(JSON.parse(savetasks));
+      } catch (error) {
+        console.error("erro ao carregar Tarefas", error);
+      }
+    };
+    loadtasks();
+  }, []);
+
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem("tasks", JSON.stringify(task));
+      } catch (error) {
+        console.error("erro ao salvar Tarefas", error);
+      }
+    };
+
+    saveTasks();
+  }, [task]);
+
+  const addtask = () => {
+    if (newtask.trim().length > 0) {
+      setTask((prevtask) => [
+        ...prevtask,
+        {
+          id: Date.now().toString(),
+          text: newtask.trim(),
+          completed: false,
+        },
+      ]);
+      setNewtask("");
+      Keyboard.dismiss();
+    } else {
+      Alert.alert("Atenção", "Por favor informe uma tarefa");
+    }
+  };
+
+  const toggleCompleteted = (id) => {
+    setTask((prevTask) =>
+      prevTask.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    Alert.alert(
+      "confirmar exclusão",
+      "Tem certeza que deseja excluir essa tarefa?",
+      [
+        { text: "cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () =>
+            setTask((prev) => prev.filter((task) => task.id !== id)),
+        },
+      ]
+    );
+  };
+
+  const renderList = ({ item }) => (
+    <View style={styles.taskItem} key={item.id}>
+      <TouchableOpacity
+        style={styles.taskTextContainer}
+        onPress={() => toggleCompleteted(item.id)}
+      >
+        <Text
+          style={[styles.taskText, item.completed && styles.completedTaskItem]}
+        >
+          {item.text}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deleteTask(item.id)}>
+        <Text style={styles.taskText}>🗑️</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Text style={styles.topBarTittle}>Minhas Tarefas</Text>
         <TouchableOpacity>
-          <Text>☀️</Text>
+          <Text>🌙</Text>
         </TouchableOpacity>
       </View>
 
@@ -23,14 +115,20 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Adicionar nova tarefa..."
+          value={newtask}
+          onChangeText={setNewtask} //onChangeText especifica somente o texto
+          onSubmitEditing={addtask} //executa a função quando o usuario clicar em "ok no Keyboard(teclado)"
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={addtask}>
           <Text style={styles.buttonText}>Adicionar</Text>
         </TouchableOpacity>
       </View>
       {/* lista de tarefas */}
       <FlatList
-        style={styles.flatList}
+        style={[styles.flatList]}
+        data={task}
+        keyExtractor={(item) => item.id}
+        renderItem={renderList}
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
             Nenhuma tarefa adicionando ainda
@@ -47,10 +145,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e0f7fa",
-
   },
   topBar: {
-    backgroundColor:"#fff",
+    backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -61,13 +158,13 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(0,0,0, 0.1)",
   },
   topBarTittle: {
-    color:"#00796b",
+    color: "#00796b",
     fontSize: 24,
     fontWeight: "bold",
   },
   card: {
-    backgroundColor:"#fff",
-    color:"#000",
+    backgroundColor: "#fff",
+    color: "#000",
     shadowColor: "#000",
     margin: 20,
     borderRadius: 15,
@@ -78,9 +175,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   input: {
-    backgroundColor:"#fcfcfc",
-    color:"#333",
-    borderColor:"#b0bec5",
+    backgroundColor: "#fcfcfc",
+    color: "#333",
+    borderColor: "#b0bec5",
     borderWidth: 1,
     borderRadius: 15,
     padding: 20,
@@ -88,7 +185,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addButton: {
-    backgroundColor:"#009688",
+    backgroundColor: "#009688",
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -123,7 +220,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   taskText: {
-    color:"#333",
+    color: "#333",
     fontSize: 18,
     flexWrap: "wrap",
   },
@@ -140,7 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   emptyListText: {
-    color:"#9e9e9e",
+    color: "#9e9e9e",
     textAlign: "center",
     marginTop: 50,
     fontSize: 16,
