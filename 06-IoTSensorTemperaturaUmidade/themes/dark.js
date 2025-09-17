@@ -1,6 +1,6 @@
 export const darkTheme = {
-    background: "#121212",
-    card: "#1e1e1e",
+    background: "#32025C",
+    card: "#091447",
     text:"#f5f5f5",
     label: "#aaa",
     border: "#444",
