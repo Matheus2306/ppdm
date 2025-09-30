@@ -32,6 +32,7 @@ export default function App() {
             headerShown: false, //Oculta o cabeçalho superior
             tabBarActiveTintColor: "#007AFF",
             tabBarInactiveTintColor: "#666",
+            animation: "shift"
           }}
         >
           <Tab.Screen
