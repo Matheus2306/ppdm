@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { SafeAreaView, StyleSheet, Text } from "react-native";
+import "react-native-get-random-values"
+//importa função uui para gerar IDs únicos
+import {v4 as uuidv4} from "uuid"
 
 export default function ProfileSccreen() {
-  const [userId] = useState("111111");
+  const [userId] = useState(uuidv4());
 
   return (
     <SafeAreaView style={styles.container}>
